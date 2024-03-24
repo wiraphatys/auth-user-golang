@@ -1,0 +1,16 @@
+server:
+  host: 127.0.0.1
+  port: 8080
+
+db:
+  host: localhost
+  port: 5432
+  user: root
+  password: 123456
+  dbname: userdb
+  sslmode: disable
+  timezone: Asia/Bangkok
+
+jwt:
+  secret: "mysecret"
+  expiration: 86400
