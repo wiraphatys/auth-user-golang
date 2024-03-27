@@ -37,3 +37,29 @@ func NewPostgresDatabase(cfg *config.Config) Database {
 func (p *postgresDatabase) GetDb() *gorm.DB {
 	return p.Db
 }
+
+func CreateUserIDTrigger(db *gorm.DB) error {
+	// Trigger function SQL
+	triggerSQL := `
+		CREATE OR REPLACE FUNCTION generate_user_id()
+		RETURNS TRIGGER AS $$
+		DECLARE
+			max_id BIGINT;
+			new_id TEXT;
+		BEGIN
+			SELECT COALESCE(MAX(SUBSTRING(id, 2)::BIGINT), 0) INTO max_id FROM users;
+			new_id := 'U' || LPAD(CAST((max_id + 1) AS TEXT), 6, '0');
+			NEW.id := new_id;
+			RETURN NEW;
+		END;
+		$$ LANGUAGE plpgsql;
+
+		CREATE TRIGGER user_id_trigger
+		BEFORE INSERT ON users
+		FOR EACH ROW
+		EXECUTE PROCEDURE generate_user_id();
+	`
+
+	// Run the trigger SQL
+	return db.Exec(triggerSQL).Error
+}
