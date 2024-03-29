@@ -56,8 +56,8 @@ func (u *userUsecaseImpl) SignInUser(user *entities.UserSignIn) (string, error) 
 	cfg := config.GetConfig()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": existUser.Email,
-		"exp":   time.Now().Add(time.Hour * time.Duration(cfg.Jwt.Expiration)).Unix(),
+		"id":  existUser.ID,
+		"exp": time.Now().Add(time.Hour * time.Duration(cfg.Jwt.Expiration)).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(cfg.Jwt.Secret))
